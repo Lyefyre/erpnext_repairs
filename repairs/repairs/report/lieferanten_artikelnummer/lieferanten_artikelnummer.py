@@ -5,15 +5,15 @@ from __future__ import unicode_literals
 import frappe
 
 def execute(filters=None):
-	columns, data = [], []
-	columns = ["Item Code:Link/Item:200"]
-
-	if filters.item:
-		item = filters.item
-	else:
-		item = "%"
-
-	sql_query = "SELECT name FROM `tabItem`".format(item=item)
-
-	data = frappe.db.sql(sql_query, as_list = True)
-	#return columns, data
+        columns, data = [], get_data(filters)
+        columns = [
+	"Item Code:Link/Item:200",
+	"Item Name::200"]
+        return columns, data
+        
+def get_data(filters):
+        conditions = " 1 = 1"
+        if filters.get('item'):
+                conditions += " and name = '{0}'".format(filters.get('item'))
+                
+        return frappe.db.sql("""SELECT name, item_code from `tabItem` where {} """.format(conditions),as_list=1)

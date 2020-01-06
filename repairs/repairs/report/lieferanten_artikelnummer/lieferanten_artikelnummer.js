@@ -1,9 +1,9 @@
 frappe.query_reports["Lieferanten-Artikelnummer"] = {
-    "filters": [
-        {
+    "filters":
+	[{
             "fieldname":"item",
-            "label": __("Item Code"),
-            "fieldtype": "Link"
-	}
-    ]
+            "label": __("Artikelnummer"),
+            "fieldtype": "Link",
+	    "options": "Item"
+	}]
 }

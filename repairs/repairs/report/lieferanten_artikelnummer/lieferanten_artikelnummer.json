@@ -1,6 +1,6 @@
 {
  "add_total_row": 0,
- "color": "orange",
+ "color": "",
  "creation": "2019-12-17 14:05:55.959189",
  "disable_prepared_report": 0,
  "disabled": 0,
@@ -8,7 +8,7 @@
  "doctype": "Report",
  "idx": 0,
  "is_standard": "Yes",
- "modified": "2019-12-17 14:08:50.762625",
+ "modified": "2019-12-17 15:34:38.052940",
  "modified_by": "Administrator",
  "module": "Repairs",
  "name": "Lieferanten-Artikelnummer",
