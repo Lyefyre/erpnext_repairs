@@ -11,22 +11,19 @@ from erpnext.stock.report.stock_ledger.stock_ledger import get_item_group_condit
 from erpnext.stock.report.stock_ageing.stock_ageing import get_fifo_queue, get_average_age
 
 from six import iteritems
-from_date = "31-12-2019"
-to_date = "31-12-2019"
 
 def execute(filters=None):
 	if not filters: filters = {}
 
 	validate_filters(filters)
 
-	from_date = "31-12-2019"
-	to_date = "31-12-2019"
+	from_date = filters.get('from_date')
+	to_date = filters.get('to_date')
 
 	include_uom = filters.get("include_uom")
 	columns = get_columns(filters)
 	items = get_items(filters)
 	sle = get_stock_ledger_entries(filters, items)
-	supplier_part_no = get_supplier_item_number(items)
 
 	if filters.get('show_stock_ageing_data'):
 		filters['show_warehouse_wise_stock'] = True
@@ -34,25 +31,29 @@ def execute(filters=None):
 
 	# if no stock ledger entry found return
 	if not sle:
-		return items
+		return columns
 
 	iwb_map = get_item_warehouse_map(filters, sle)
 	item_map = get_item_details(items, sle, filters)
 	item_reorder_detail_map = get_item_reorder_details(item_map.keys())
+	supplier_part_no_map = get_supplier_item_number(item_map.keys())
 
 	data = []
 	conversion_factors = {}
 
 	_func = lambda x: x[1]
-
 	for (company, item, warehouse) in sorted(iwb_map):
 		if item_map.get(item):
 			qty_dict = iwb_map[(company, item, warehouse)]
 			item_reorder_level = 0
 			item_reorder_qty = 0
+
 			if item + warehouse in item_reorder_detail_map:
 				item_reorder_level = item_reorder_detail_map[item + warehouse]["warehouse_reorder_level"]
 				item_reorder_qty = item_reorder_detail_map[item + warehouse]["warehouse_reorder_qty"]
+
+			if item in supplier_part_no_map:
+				supplier_part_no = supplier_part_no_map[item]["supplier_part_no"]
 
 			report_data = {
 				'item_code': item,
@@ -60,7 +61,9 @@ def execute(filters=None):
 				'company': company,
 				'reorder_level': item_reorder_level,
 				'reorder_qty': item_reorder_qty,
+				'supplier_part_no': supplier_part_no
 			}
+
 			report_data.update(item_map[item])
 			report_data.update(qty_dict)
 
@@ -102,17 +105,10 @@ def get_columns(filters):
 		{"label": _("Warehouse"), "fieldname": "warehouse", "fieldtype": "Link", "options": "Warehouse", "width": 100},
 		{"label": _("Stock UOM"), "fieldname": "stock_uom", "fieldtype": "Link", "options": "UOM", "width": 90},
 		{"label": _("Balance Qty"), "fieldname": "bal_qty", "fieldtype": "Float", "width": 100, "convertible": "qty"},
-		{"label": _("Balance Value"), "fieldname": "bal_val", "fieldtype": "Currency", "width": 100},
 		{"label": _("Opening Qty"), "fieldname": "opening_qty", "fieldtype": "Float", "width": 100, "convertible": "qty"},
-		{"label": _("Opening Value"), "fieldname": "opening_val", "fieldtype": "Float", "width": 110},
 		{"label": _("In Qty"), "fieldname": "in_qty", "fieldtype": "Float", "width": 80, "convertible": "qty"},
-		{"label": _("In Value"), "fieldname": "in_val", "fieldtype": "Float", "width": 80},
 		{"label": _("Out Qty"), "fieldname": "out_qty", "fieldtype": "Float", "width": 80, "convertible": "qty"},
-		{"label": _("Out Value"), "fieldname": "out_val", "fieldtype": "Float", "width": 80},
 		{"label": _("Valuation Rate"), "fieldname": "val_rate", "fieldtype": "Currency", "width": 90, "convertible": "rate"},
-		{"label": _("Reorder Level"), "fieldname": "reorder_level", "fieldtype": "Float", "width": 80, "convertible": "qty"},
-		{"label": _("Reorder Qty"), "fieldname": "reorder_qty", "fieldtype": "Float", "width": 80, "convertible": "qty"},
-		{"label": _("Company"), "fieldname": "company", "fieldtype": "Link", "options": "Company", "width": 100},
 		{"label": _("Supplier Item Number"), "fieldname": "supplier_part_no", "fieldtype": "Link", "options": "Item Supplier", "width": 100}
 	]
 
@@ -128,10 +124,10 @@ def get_columns(filters):
 
 def get_conditions(filters):
 	conditions = ""
-	if not from_date:
+	if not filters.get("from_date"):
 		frappe.throw(_("'From Date' is required"))
 
-	if to_date:
+	if filters.get("to_date"):
 		conditions += " and sle.posting_date <= %s" % frappe.db.escape(filters.get("to_date"))
 	else:
 		frappe.throw(_("'To Date' is required"))
@@ -291,11 +287,11 @@ def get_item_reorder_details(items):
 		""".format(', '.join([frappe.db.escape(i, percent=False) for i in items])), as_dict=1)
 
 	return dict((d.parent + d.warehouse, d) for d in item_reorder_details)
-    
+
 def get_supplier_item_number(items):
 	supplier_item_number = frappe._dict()
 	if items:
-		supplier_item_number = frappe.db.sql("""select supplier_part_no from `tabItem Supplier` where parent in ({0})""".format(', '.join([frappe.db.escape(i, percent=False) for i in items])), as_dict=1)
+		supplier_item_number = frappe.db.sql("""select parent, supplier_part_no from `tabItem Supplier` where parent in ({0})""".format(', '.join([frappe.db.escape(i, percent=False) for i in items])), as_dict=1)
 
 	return dict((d.parent, d) for d in supplier_item_number)
 
