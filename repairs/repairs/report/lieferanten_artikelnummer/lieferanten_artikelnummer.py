@@ -97,19 +97,19 @@ def get_columns(filters):
 	"""return columns"""
 
 	columns = [
-		{"label": _("Item"), "fieldname": "item_code", "fieldtype": "Link", "options": "Item", "width": 100},
+		{"label": _("Artikel"), "fieldname": "item_code", "fieldtype": "Link", "options": "Item", "width": 100},
 		{"label": _("Item Name"), "fieldname": "item_name", "width": 150},
-		{"label": _("Item Group"), "fieldname": "item_group", "fieldtype": "Link", "options": "Item Group", "width": 100},
-		{"label": _("Brand"), "fieldname": "brand", "fieldtype": "Link", "options": "Brand", "width": 90},
-		{"label": _("Description"), "fieldname": "description", "width": 140},
-		{"label": _("Warehouse"), "fieldname": "warehouse", "fieldtype": "Link", "options": "Warehouse", "width": 100},
-		{"label": _("Stock UOM"), "fieldname": "stock_uom", "fieldtype": "Link", "options": "UOM", "width": 90},
-		{"label": _("Balance Qty"), "fieldname": "bal_qty", "fieldtype": "Float", "width": 100, "convertible": "qty"},
+		{"label": _("Artikelgruppe"), "fieldname": "item_group", "fieldtype": "Link", "options": "Item Group", "width": 100},
+		{"label": _("Marke"), "fieldname": "brand", "fieldtype": "Link", "options": "Brand", "width": 90},
+		{"label": _("Beschreibung"), "fieldname": "description", "width": 140},
+		{"label": _("Warenlager"), "fieldname": "warehouse", "fieldtype": "Link", "options": "Warehouse", "width": 100},
+		{"label": _("Masseinheit"), "fieldname": "stock_uom", "fieldtype": "Link", "options": "UOM", "width": 90},
+		{"label": _("Lagerbenstand"), "fieldname": "bal_qty", "fieldtype": "Float", "width": 100, "convertible": "qty"},
 		{"label": _("Opening Qty"), "fieldname": "opening_qty", "fieldtype": "Float", "width": 100, "convertible": "qty"},
-		{"label": _("In Qty"), "fieldname": "in_qty", "fieldtype": "Float", "width": 80, "convertible": "qty"},
-		{"label": _("Out Qty"), "fieldname": "out_qty", "fieldtype": "Float", "width": 80, "convertible": "qty"},
-		{"label": _("Valuation Rate"), "fieldname": "val_rate", "fieldtype": "Currency", "width": 90, "convertible": "rate"},
-		{"label": _("Supplier Item Number"), "fieldname": "supplier_part_no", "fieldtype": "Link", "options": "Item Supplier", "width": 100}
+		{"label": _("Eingang"), "fieldname": "in_qty", "fieldtype": "Float", "width": 80, "convertible": "qty"},
+		{"label": _("Ausgang"), "fieldname": "out_qty", "fieldtype": "Float", "width": 80, "convertible": "qty"},
+		{"label": _("Wert"), "fieldname": "val_rate", "fieldtype": "Currency", "width": 90, "convertible": "rate"},
+		{"label": _("Lieferanten-Artikelnummer"), "fieldname": "supplier_part_no", "fieldtype": "string", "width": 100}
 	]
 
 	if filters.get('show_stock_ageing_data'):
