@@ -36,7 +36,8 @@ def execute(filters=None):
 	iwb_map = get_item_warehouse_map(filters, sle)
 	item_map = get_item_details(items, sle, filters)
 	item_reorder_detail_map = get_item_reorder_details(item_map.keys())
-	supplier_part_no_map = get_supplier_item_number(item_map.keys())
+	supplier_part_no_map = get_supplier_item_numbers(item_map.keys())
+	price_list_rates_map = get_price_list_rates(item_map.keys())
 
 	data = []
 	conversion_factors = {}
@@ -47,6 +48,8 @@ def execute(filters=None):
 			qty_dict = iwb_map[(company, item, warehouse)]
 			item_reorder_level = 0
 			item_reorder_qty = 0
+			supplier_part_no = ""
+			price_list_rate = ""
 
 			if item + warehouse in item_reorder_detail_map:
 				item_reorder_level = item_reorder_detail_map[item + warehouse]["warehouse_reorder_level"]
@@ -55,13 +58,17 @@ def execute(filters=None):
 			if item in supplier_part_no_map:
 				supplier_part_no = supplier_part_no_map[item]["supplier_part_no"]
 
+			if item in price_list_rates_map:
+				price_list_rate = price_list_rates_map[item]["price_list_rate"]
+
 			report_data = {
 				'item_code': item,
 				'warehouse': warehouse,
 				'company': company,
 				'reorder_level': item_reorder_level,
 				'reorder_qty': item_reorder_qty,
-				'supplier_part_no': supplier_part_no
+				'supplier_part_no': supplier_part_no,
+				'price_list_rate': price_list_rate
 			}
 
 			report_data.update(item_map[item])
@@ -98,27 +105,18 @@ def get_columns(filters):
 
 	columns = [
 		{"label": _("Artikel"), "fieldname": "item_code", "fieldtype": "Link", "options": "Item", "width": 100},
-		{"label": _("Item Name"), "fieldname": "item_name", "width": 150},
+                {"label": _("Lieferanten-Artikelnummer"), "fieldname": "supplier_part_no", "fieldtype": "string", "width": 100},
+		{"label": _("Artikelname"), "fieldname": "item_name", "width": 150},
+                {"label": _("Beschreibung"), "fieldname": "description", "width": 140},
 		{"label": _("Artikelgruppe"), "fieldname": "item_group", "fieldtype": "Link", "options": "Item Group", "width": 100},
 		{"label": _("Marke"), "fieldname": "brand", "fieldtype": "Link", "options": "Brand", "width": 90},
-		{"label": _("Beschreibung"), "fieldname": "description", "width": 140},
-		{"label": _("Warenlager"), "fieldname": "warehouse", "fieldtype": "Link", "options": "Warehouse", "width": 100},
-		{"label": _("Masseinheit"), "fieldname": "stock_uom", "fieldtype": "Link", "options": "UOM", "width": 90},
-		{"label": _("Lagerbenstand"), "fieldname": "bal_qty", "fieldtype": "Float", "width": 100, "convertible": "qty"},
-		{"label": _("Opening Qty"), "fieldname": "opening_qty", "fieldtype": "Float", "width": 100, "convertible": "qty"},
-		{"label": _("Eingang"), "fieldname": "in_qty", "fieldtype": "Float", "width": 80, "convertible": "qty"},
-		{"label": _("Ausgang"), "fieldname": "out_qty", "fieldtype": "Float", "width": 80, "convertible": "qty"},
-		{"label": _("Wert"), "fieldname": "val_rate", "fieldtype": "Currency", "width": 90, "convertible": "rate"},
-		{"label": _("Lieferanten-Artikelnummer"), "fieldname": "supplier_part_no", "fieldtype": "string", "width": 100}
+                {"label": _("Verkaufspreis"), "fieldname": "price_list_rate", "fieldtype": "Currency", "width": 90, "convertible": "rate"},
+		{"label": _("Anfangsbestand"), "fieldname": "opening_qty", "fieldtype": "Float", "width": 100, "convertible": "qty"},
+		{"label": _("Einkauf"), "fieldname": "in_qty", "fieldtype": "Float", "width": 80, "convertible": "qty"},
+		{"label": _("Verkauf"), "fieldname": "out_qty", "fieldtype": "Float", "width": 80, "convertible": "qty"},
+                {"label": _("Lagerbestand"), "fieldname": "bal_qty", "fieldtype": "Float", "width": 100, "convertible": "qty"},
+		{"label": _("Bilanzwert"), "fieldname": "val_rate", "fieldtype": "Currency", "width": 90, "convertible": "rate"}
 	]
-
-	if filters.get('show_stock_ageing_data'):
-		columns += [{'label': _('Average Age'), 'fieldname': 'average_age', 'width': 100},
-		{'label': _('Earliest Age'), 'fieldname': 'earliest_age', 'width': 100},
-		{'label': _('Latest Age'), 'fieldname': 'latest_age', 'width': 100}]
-
-	if filters.get('show_variant_attributes'):
-		columns += [{'label': att_name, 'fieldname': att_name, 'width': 100} for att_name in get_variants_attributes()]
 
 	return columns
 
@@ -288,12 +286,19 @@ def get_item_reorder_details(items):
 
 	return dict((d.parent + d.warehouse, d) for d in item_reorder_details)
 
-def get_supplier_item_number(items):
-	supplier_item_number = frappe._dict()
+def get_supplier_item_numbers(items):
+	supplier_item_numbers = frappe._dict()
 	if items:
-		supplier_item_number = frappe.db.sql("""select parent, supplier_part_no from `tabItem Supplier` where parent in ({0})""".format(', '.join([frappe.db.escape(i, percent=False) for i in items])), as_dict=1)
+		supplier_item_numbers = frappe.db.sql("""select parent, supplier_part_no from `tabItem Supplier` where parent in ({0})""".format(', '.join([frappe.db.escape(i, percent=False) for i in items])), as_dict=1)
 
-	return dict((d.parent, d) for d in supplier_item_number)
+	return dict((d.parent, d) for d in supplier_item_numbers)
+
+def get_price_list_rates(items):
+	selling_prices = frappe._dict()
+	if items:
+		selling_prices = frappe.db.sql("""select item_code, price_list_rate from `tabItem Price` where price_list like "Standard-Vertrieb" and item_code in ({0})""".format(','.join([frappe.db.escape(i, percent=False) for i in items])), as_dict=1)
+
+	return dict((d.item_code, d) for d in selling_prices)
 
 def validate_filters(filters):
 	if not (filters.get("item_code") or filters.get("warehouse")):
