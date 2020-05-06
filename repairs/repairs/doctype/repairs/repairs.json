@@ -1,0 +1,255 @@
+{
+ "autoname": "REP-.#####",
+ "creation": "2020-03-30 10:02:25.300038",
+ "doctype": "DocType",
+ "editable_grid": 1,
+ "engine": "InnoDB",
+ "field_order": [
+  "history",
+  "column_break_2",
+  "repair_status",
+  "location",
+  "section_break_2",
+  "customer",
+  "entry_date",
+  "appointment",
+  "column_break_7",
+  "customer_address",
+  "repair_type",
+  "guarantee",
+  "section_break_15",
+  "brand",
+  "quotation",
+  "offer_accepted",
+  "work_tbd",
+  "column_break_15",
+  "supplier",
+  "release_until",
+  "price",
+  "recieve_item",
+  "section_break_19",
+  "material",
+  "item_group",
+  "caliber",
+  "work_done",
+  "section_break_27",
+  "item_subgroup",
+  "reference",
+  "supplier_appointment",
+  "customer_informed",
+  "retrieved"
+ ],
+ "fields": [
+  {
+   "fieldname": "entry_date",
+   "fieldtype": "Date",
+   "label": "Entry Date"
+  },
+  {
+   "fieldname": "customer",
+   "fieldtype": "Link",
+   "in_list_view": 1,
+   "label": "Customer",
+   "options": "Customer",
+   "reqd": 1
+  },
+  {
+   "fieldname": "offer_accepted",
+   "fieldtype": "Date",
+   "hidden": 1,
+   "label": "Offer accepted"
+  },
+  {
+   "fieldname": "appointment",
+   "fieldtype": "Date",
+   "label": "Appointment"
+  },
+  {
+   "default": "0",
+   "fieldname": "customer_informed",
+   "fieldtype": "Check",
+   "hidden": 1,
+   "label": "Customer Informed"
+  },
+  {
+   "fieldname": "retrieved",
+   "fieldtype": "Date",
+   "hidden": 1,
+   "label": "Retrieved"
+  },
+  {
+   "fieldname": "location",
+   "fieldtype": "Link",
+   "label": "Location",
+   "options": "Warehouse"
+  },
+  {
+   "fieldname": "repair_status",
+   "fieldtype": "Select",
+   "in_list_view": 1,
+   "in_standard_filter": 1,
+   "label": "Repair Status",
+   "options": "Recieved\nQuotation prepared\nTo be repaired\nIn progress\nReady for pickup\nRetrieved\nReturned unrepaired"
+  },
+  {
+   "fieldname": "section_break_15",
+   "fieldtype": "Section Break"
+  },
+  {
+   "fieldname": "repair_type",
+   "fieldtype": "Select",
+   "in_list_view": 1,
+   "label": "Repair Type",
+   "options": "Schmuck\nUhren",
+   "reqd": 1
+  },
+  {
+   "default": "0",
+   "fieldname": "quotation",
+   "fieldtype": "Check",
+   "label": "Quotation wanted?"
+  },
+  {
+   "fieldname": "release_until",
+   "fieldtype": "Currency",
+   "label": "Release until"
+  },
+  {
+   "fieldname": "price",
+   "fieldtype": "Currency",
+   "label": "Price"
+  },
+  {
+   "fieldname": "section_break_19",
+   "fieldtype": "Section Break",
+   "hidden": 1
+  },
+  {
+   "fieldname": "item_group",
+   "fieldtype": "Link",
+   "hidden": 1,
+   "label": "Item Group",
+   "options": "Item Group"
+  },
+  {
+   "fieldname": "item_subgroup",
+   "fieldtype": "Table",
+   "hidden": 1,
+   "label": "Item Subgroup",
+   "options": "Repair Item Group"
+  },
+  {
+   "fieldname": "material",
+   "fieldtype": "Table",
+   "hidden": 1,
+   "label": "Material",
+   "options": "Item Detail"
+  },
+  {
+   "fieldname": "brand",
+   "fieldtype": "Link",
+   "label": "Brand",
+   "options": "Brand"
+  },
+  {
+   "fieldname": "reference",
+   "fieldtype": "Data",
+   "hidden": 1,
+   "label": "Reference"
+  },
+  {
+   "fieldname": "caliber",
+   "fieldtype": "Data",
+   "hidden": 1,
+   "label": "Caliber"
+  },
+  {
+   "default": "0",
+   "fieldname": "guarantee",
+   "fieldtype": "Check",
+   "label": "Warranty"
+  },
+  {
+   "fieldname": "section_break_27",
+   "fieldtype": "Column Break",
+   "hidden": 1
+  },
+  {
+   "fieldname": "supplier",
+   "fieldtype": "Link",
+   "label": "Supplier",
+   "options": "Supplier"
+  },
+  {
+   "fieldname": "supplier_appointment",
+   "fieldtype": "Date",
+   "hidden": 1,
+   "label": "Supplier Appointment"
+  },
+  {
+   "fieldname": "work_tbd",
+   "fieldtype": "Small Text",
+   "label": "Work TBD"
+  },
+  {
+   "fieldname": "recieve_item",
+   "fieldtype": "Button",
+   "label": "Recieve Item"
+  },
+  {
+   "fieldname": "customer_address",
+   "fieldtype": "HTML",
+   "label": "Address"
+  },
+  {
+   "fieldname": "history",
+   "fieldtype": "HTML",
+   "label": "History"
+  },
+  {
+   "fieldname": "column_break_7",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "section_break_2",
+   "fieldtype": "Section Break"
+  },
+  {
+   "fieldname": "column_break_2",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "column_break_15",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "work_done",
+   "fieldtype": "Small Text",
+   "hidden": 1,
+   "label": "Work Done"
+  }
+ ],
+ "modified": "2020-05-05 09:29:04.133640",
+ "modified_by": "valentin@itigo.ch",
+ "module": "Repairs",
+ "name": "Repairs",
+ "owner": "valentin@itigo.ch",
+ "permissions": [
+  {
+   "create": 1,
+   "delete": 1,
+   "email": 1,
+   "export": 1,
+   "print": 1,
+   "read": 1,
+   "report": 1,
+   "role": "System Manager",
+   "share": 1,
+   "write": 1
+  }
+ ],
+ "quick_entry": 1,
+ "sort_field": "modified",
+ "sort_order": "DESC",
+ "track_changes": 1
+}

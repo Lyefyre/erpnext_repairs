@@ -1,0 +1,39 @@
+{
+ "creation": "2020-04-02 13:59:19.655344",
+ "doctype": "DocType",
+ "editable_grid": 1,
+ "engine": "InnoDB",
+ "field_order": [
+  "id"
+ ],
+ "fields": [
+  {
+   "fieldname": "id",
+   "fieldtype": "Data",
+   "label": "id"
+  }
+ ],
+ "modified": "2020-04-06 16:08:20.852583",
+ "modified_by": "Administrator",
+ "module": "Repairs",
+ "name": "testingnew",
+ "owner": "valentin@itigo.ch",
+ "permissions": [
+  {
+   "create": 1,
+   "delete": 1,
+   "email": 1,
+   "export": 1,
+   "print": 1,
+   "read": 1,
+   "report": 1,
+   "role": "System Manager",
+   "share": 1,
+   "write": 1
+  }
+ ],
+ "quick_entry": 1,
+ "sort_field": "modified",
+ "sort_order": "DESC",
+ "track_changes": 1
+}
