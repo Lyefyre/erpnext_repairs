@@ -1,12 +1,10 @@
 // Copyright (c) 2020, libracore AG and contributors
 // For license information, please see license.txt
 
-var Switch1 = false;
-var Switch2 = false;
 
 frappe.ui.form.on('Repairs', {
 
-    refresh: function(frm) {
+    refresh: function (frm) {
         get_customer_address();
         get_dates();
 
@@ -16,50 +14,70 @@ frappe.ui.form.on('Repairs', {
             cur_frm.toggle_display("offer_accepted", false);
         }
 
-        frm.add_custom_button(__("E-Mail schreiben"), function() {
+        frm.add_custom_button(__("E-Mail schreiben"), function () {
             write_email();
         });
 
-        if (Switch1 == true && Switch2 == false) {
-            frm.add_custom_button(__("Reparatur abschliessen"), function() {
+        if (cur_frm.doc.repstatus == "Finish") {
+            frm.add_custom_button(__("Reparatur abschliessen"), function () {
                 if (!frm.doc.entry_date || !frm.doc.location || !frm.doc.price || !frm.doc.work_tbd) {
                     frappe.confirm(
                         'Warnung! Es wurden leere Felder entdeckt, deren Inhalte für das Abschliessen der Reparatur notwendig sind. Reparatur dennoch abschliessen?',
-                        function() {},
-                        function() {
+                        function () {
+                            frm.set_value('repair_status', "Ready for pickup");
+                            frappe.confirm(
+                                'Reparatur abgeschlossen! Möchten Sie den Kunden informieren? Alle bisherigen Eingaben werden gespeichert.',
+                                function () {
+                                    frm.doc.customer_informed = Number(1);
+                                    write_email();
+                                },
+                                function () {
+                                    return;
+                                }
+                            );
+                            frm.set_value('repstatus', 'Createitem');
+                            frm.save();
+                        },
+                        function () {
                             return;
                         }
                     )
                 }
-                frm.set_value('repair_status', "Ready for pickup");
-                frappe.confirm(
-                    'Reparatur abgeschlossen! Möchten Sie den Kunden informieren? Alle bisherigen Eingaben werden gespeichert.',
-                    function() {
-                        frm.doc.customer_informed = Number(1);
-                        frm.save();
-                        write_email();
-                    },
-                    function() {
-                        return;
-                    }
-                );
-                Switch1 = false;
-                Switch2 = true;
             });
         }
 
-        if (Switch2 == true) {
-            frm.add_custom_button(__("Reparaturartikel erstellen"), function() {
+        if (cur_frm.doc.repstatus == "Createitem") {
+            frm.add_custom_button(__("Reparaturartikel erstellen"), function () {
                 frappe.db.insert({
                     doctype: 'Item',
                     name: frm.doc.name,
                     item_code: frm.doc.name,
                     creation: get_date_today(),
                     item_group: 'Reparaturen',
-                    description: frm.doc.work_done
+                    description: frm.doc.work_done,
+                    valuation_rate: 0.01
                 });
-                show_alert("Reparaturartikel wurde erstellt!", 5);
-                Switch2 == false;
+                show_alert("Reparaturartikel wurde erstellt! Alle Eingaben werden gespeichert", 5);
+                frm.set_value('repstatus', 'Stockentry');
+                frm.save();
+            });
+        }
+
+        if (cur_frm.doc.repstatus == "Stockentry") {
+            frm.add_custom_button(__("Reparaturartikel verbuchen"), function () {
+                frappe.call({
+                    method: "repairs.repairs.doctype.repairs.repairs.create_stock",
+                    args: {
+                        "item": cur_frm.doc.name
+                    },
+                    callback: function (r) {
+                        if (r.message) {
+                            show_alert("Reparaturartikel wurde verbucht, aber muss noch gespeichert werden! Alle Eingaben werden gespeichert", 5);
+                        }
+                    }
+                });
+                frm.set_value('repstatus', 'End');
+                frm.save();
             });
         }
 
@@ -104,7 +122,7 @@ frappe.ui.form.on('Repairs', {
         }
     },
 
-    quotation: function(frm) {
+    quotation: function (frm) {
         if (frm.doc.quotation == 1) {
             cur_frm.toggle_display("offer_accepted", true);
         } else {
@@ -112,35 +130,35 @@ frappe.ui.form.on('Repairs', {
         }
     },
 
-    offer_accepted: function(frm) {
+    offer_accepted: function (frm) {
         if (frm.doc.offer_accepted) {
             frm.set_value('repair_status', "To be repaired");
         }
     },
 
-    guarantee: function(frm) {
+    guarantee: function (frm) {
         if (frm.doc.guarantee) {
             frm.set_value('price', 0);
         }
     },
 
-    recieve_item: function(frm) {
+    recieve_item: function (frm) {
         frappe.confirm(
             'Die Entgegennahme des Gegenstandes wird abgeschlossen und die Eingaben gespeichert. Ist das in Ordnung?',
-            function() {
+            function () {
                 var today = get_date_today();
                 frm.set_value('entry_date', today);
                 frm.save();
                 group_trigger_2();
-                Switch1 = true;
+                frm.set_value('repstatus', 'Finish');
             },
-            function() {
+            function () {
                 return;
             }
         );
     },
 
-    customer: function(frm) {
+    customer: function (frm) {
         get_customer_address();
     }
 
@@ -156,7 +174,7 @@ function get_customer_address() {
             },
             fieldname: ['customer_name', 'address_line1', 'city', 'pincode', 'country']
         },
-        callback: function(r) {
+        callback: function (r) {
             var customer = r.message;
             var customer_info = (customer.customer_name + "<br>" + customer.address_line1 + "<br>" + customer.pincode + " " + customer.city + "<br>" + customer.country);
             cur_frm.set_df_property('customer_address', 'options', customer_info);
