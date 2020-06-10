@@ -6,39 +6,40 @@
  "engine": "InnoDB",
  "field_order": [
   "history",
-  "repstatus",
   "column_break_2",
-  "repair_status",
+  "repstatus",
   "location",
+  "repair_status",
   "section_break_2",
   "customer",
+  "customer_email",
   "entry_date",
   "appointment",
   "column_break_7",
   "customer_address",
-  "repair_type",
-  "guarantee",
   "section_break_15",
-  "brand",
+  "material",
+  "item_group",
+  "caliber",
+  "guarantee",
   "quotation",
   "offer_accepted",
-  "work_tbd",
   "column_break_15",
-  "supplier",
+  "item_subgroup",
+  "reference",
+  "brand",
   "release_until",
   "price",
   "recieve_item",
   "section_break_19",
-  "material",
-  "item_group",
-  "caliber",
-  "work_done",
-  "section_break_27",
-  "item_subgroup",
-  "reference",
-  "supplier_appointment",
+  "supplier",
+  "work_tbd",
   "customer_informed",
-  "retrieved"
+  "section_break_27",
+  "supplier_appointment",
+  "work_done",
+  "retrieved",
+  "amended_from"
  ],
  "fields": [
   {
@@ -69,13 +70,11 @@
    "default": "0",
    "fieldname": "customer_informed",
    "fieldtype": "Check",
-   "hidden": 1,
    "label": "Customer Informed"
   },
   {
    "fieldname": "retrieved",
    "fieldtype": "Date",
-   "hidden": 1,
    "label": "Retrieved"
   },
   {
@@ -85,6 +84,7 @@
    "options": "Warehouse"
   },
   {
+   "description": "This field is used to track the repair status for the available buttons buttons. Hidden field",
    "fieldname": "repair_status",
    "fieldtype": "Select",
    "in_list_view": 1,
@@ -95,14 +95,6 @@
   {
    "fieldname": "section_break_15",
    "fieldtype": "Section Break"
-  },
-  {
-   "fieldname": "repair_type",
-   "fieldtype": "Select",
-   "in_list_view": 1,
-   "label": "Repair Type",
-   "options": "Schmuck\nUhren",
-   "reqd": 1
   },
   {
    "default": "0",
@@ -128,21 +120,18 @@
   {
    "fieldname": "item_group",
    "fieldtype": "Link",
-   "hidden": 1,
    "label": "Item Group",
    "options": "Item Group"
   },
   {
    "fieldname": "item_subgroup",
    "fieldtype": "Table",
-   "hidden": 1,
    "label": "Item Subgroup",
    "options": "Repair Item Group"
   },
   {
    "fieldname": "material",
    "fieldtype": "Table",
-   "hidden": 1,
    "label": "Material",
    "options": "Item Detail"
   },
@@ -155,13 +144,11 @@
   {
    "fieldname": "reference",
    "fieldtype": "Data",
-   "hidden": 1,
    "label": "Reference"
   },
   {
    "fieldname": "caliber",
    "fieldtype": "Data",
-   "hidden": 1,
    "label": "Caliber"
   },
   {
@@ -184,13 +171,12 @@
   {
    "fieldname": "supplier_appointment",
    "fieldtype": "Date",
-   "hidden": 1,
    "label": "Supplier Appointment"
   },
   {
    "fieldname": "work_tbd",
    "fieldtype": "Small Text",
-   "label": "Work TBD"
+   "label": "Description"
   },
   {
    "fieldname": "recieve_item",
@@ -226,7 +212,6 @@
   {
    "fieldname": "work_done",
    "fieldtype": "Small Text",
-   "hidden": 1,
    "label": "Work Done"
   },
   {
@@ -236,10 +221,27 @@
    "label": "Repstatus",
    "options": "Start\nFinish\nCreateitem\nStockentry\nEnd",
    "read_only": 1
+  },
+  {
+   "fieldname": "customer_email",
+   "fieldtype": "Data",
+   "hidden": 1,
+   "label": "Customer E-Mail",
+   "options": "This field is used to store the customer's email. it is hidden."
+  },
+  {
+   "fieldname": "amended_from",
+   "fieldtype": "Link",
+   "label": "Amended From",
+   "no_copy": 1,
+   "options": "Repairs",
+   "print_hide": 1,
+   "read_only": 1
   }
  ],
- "modified": "2020-05-07 09:11:15.112083",
- "modified_by": "valentin@itigo.ch",
+ "is_submittable": 1,
+ "modified": "2020-06-10 09:11:16.157086",
+ "modified_by": "Administrator",
  "module": "Repairs",
  "name": "Repairs",
  "owner": "valentin@itigo.ch",
